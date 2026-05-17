@@ -1,0 +1,20 @@
+{
+  "org": "Noetic-Creative",
+  "site_title": "Noetic Creative",
+  "site_description": "Internal repository index",
+  "folders": [
+    {
+      "id": "design",
+      "name": "Design & Brand",
+      "icon": "◈",
+      "repos": ["lum-brand-skill", "noetic-proposals", "noetic-pitch-creator", "caesarstone-slide-generator"]
+    },
+    {
+      "id": "internal",
+      "name": "Internal Tools",
+      "icon": "⬡",
+      "repos": ["hr-os", "sop-hub", "atlas"]
+    }
+  ],
+  "ungrouped_label": "Other"
+}
