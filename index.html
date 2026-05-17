@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noetic Creative — Repos</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0c0c0c;
+    --bg2: #131313;
+    --bg3: #1a1a1a;
+    --border: #242424;
+    --border-hover: #3a3a3a;
+    --text: #e8e8e8;
+    --text2: #888;
+    --text3: #555;
+    --green: #3dffa0;
+    --green-dim: rgba(61,255,160,0.08);
+    --green-dim2: rgba(61,255,160,0.15);
+    --red: #ff5f5f;
+    --yellow: #ffd166;
+    --radius: 8px;
+    --sidebar: 240px;
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  html { height: 100%; }
+  body { min-height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; }
+
+  /* ── TOP BAR ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(12,12,12,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 24px; height: 56px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); font-weight: 600; font-size: 15px; letter-spacing: -0.3px; }
+  .logo-mark { width: 28px; height: 28px; background: var(--green); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  .logo-mark svg { width: 16px; height: 16px; }
+  .header-sep { flex: 1; }
+  .search-wrap { position: relative; }
+  .search-wrap input {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--text); font-size: 13px; padding: 6px 12px 6px 32px;
+    width: 220px; outline: none; transition: border-color .15s, width .2s;
+  }
+  .search-wrap input:focus { border-color: var(--green); width: 280px; }
+  .search-wrap .search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; }
+  .btn-token {
+    background: transparent; border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--text2); font-size: 12px; padding: 5px 10px; cursor: pointer; transition: all .15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .btn-token:hover { border-color: var(--green); color: var(--green); }
+  .btn-token.active { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+
+  /* ── LAYOUT ── */
+  .layout { display: flex; min-height: calc(100vh - 56px); }
+
+  /* ── SIDEBAR ── */
+  aside {
+    width: var(--sidebar); flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    padding: 20px 0; position: sticky; top: 56px;
+    height: calc(100vh - 56px); overflow-y: auto;
+  }
+  .sidebar-section { padding: 0 12px; margin-bottom: 4px; }
+  .sidebar-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; color: var(--text3); text-transform: uppercase; padding: 8px 8px 4px; }
+  .folder-btn {
+    display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+    background: none; border: none; color: var(--text2); font-size: 13px; padding: 7px 8px;
+    border-radius: 6px; cursor: pointer; transition: all .12s;
+  }
+  .folder-btn:hover { background: var(--bg3); color: var(--text); }
+  .folder-btn.active { background: var(--green-dim); color: var(--green); }
+  .folder-btn .folder-icon { font-size: 14px; width: 18px; text-align: center; }
+  .folder-btn .folder-count { margin-left: auto; font-size: 11px; color: var(--text3); background: var(--bg3); padding: 1px 6px; border-radius: 10px; }
+  .folder-btn.active .folder-count { background: var(--green-dim2); color: var(--green); }
+
+  /* ── MAIN ── */
+  main { flex: 1; padding: 28px 32px; max-width: 1100px; }
+
+  .toolbar {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .toolbar-title { font-size: 18px; font-weight: 600; letter-spacing: -0.4px; flex: 1; min-width: 120px; }
+  .toolbar-title span { color: var(--text3); font-weight: 400; font-size: 14px; margin-left: 8px; }
+  .sort-group { display: flex; gap: 4px; }
+  .sort-btn {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text2); font-size: 12px; padding: 5px 10px; cursor: pointer; transition: all .12s;
+  }
+  .sort-btn:hover { border-color: var(--border-hover); color: var(--text); }
+  .sort-btn.active { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+  .view-toggle { display: flex; gap: 2px; }
+  .view-btn {
+    background: var(--bg3); border: 1px solid var(--border); padding: 5px 8px;
+    cursor: pointer; color: var(--text3); transition: all .12s; font-size: 13px;
+  }
+  .view-btn:first-child { border-radius: 6px 0 0 6px; }
+  .view-btn:last-child { border-radius: 0 6px 6px 0; }
+  .view-btn.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+
+  /* ── REPO GRID ── */
+  .repo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .repo-grid.list-view { grid-template-columns: 1fr; }
+
+  .repo-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px; transition: border-color .15s, transform .12s;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 10px;
+    cursor: pointer;
+  }
+  .repo-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+  .repo-grid.list-view .repo-card { flex-direction: row; align-items: center; gap: 16px; padding: 14px 18px; }
+
+  .repo-top { display: flex; align-items: flex-start; gap: 10px; }
+  .repo-icon { width: 32px; height: 32px; background: var(--bg3); border-radius: 6px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; color: var(--text3); }
+  .repo-name { font-weight: 600; font-size: 14px; color: var(--text); letter-spacing: -0.2px; }
+  .repo-name a { color: inherit; text-decoration: none; }
+  .repo-name a:hover { color: var(--green); }
+  .repo-private { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; color: var(--text3); background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; margin-left: 6px; vertical-align: middle; }
+  .repo-desc { font-size: 13px; color: var(--text2); line-height: 1.5; flex: 1; }
+  .repo-grid.list-view .repo-desc { flex: 1; }
+  .repo-meta { display: flex; align-items: center; gap: 14px; margin-top: auto; flex-wrap: wrap; }
+  .repo-grid.list-view .repo-meta { margin-top: 0; margin-left: auto; flex-shrink: 0; }
+  .repo-lang { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text3); }
+  .lang-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .repo-stat { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--text3); }
+  .repo-updated { font-size: 11px; color: var(--text3); }
+  .repo-folder-tag { font-size: 10px; background: var(--green-dim); color: var(--green); border: 1px solid rgba(61,255,160,.2); border-radius: 4px; padding: 1px 6px; }
+
+  /* ── LANG COLORS ── */
+  .lang-TypeScript { background: #3178c6; }
+  .lang-JavaScript { background: #f7df1e; }
+  .lang-HTML { background: #e34c26; }
+  .lang-CSS { background: #563d7c; }
+  .lang-Python { background: #3572A5; }
+  .lang-default { background: #555; }
+
+  /* ── TOKEN MODAL ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.hidden { display: none; }
+  .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; width: 440px; max-width: 90vw; }
+  .modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .modal p { font-size: 13px; color: var(--text2); margin-bottom: 18px; line-height: 1.6; }
+  .modal input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 13px; padding: 10px 12px; outline: none; font-family: monospace; }
+  .modal input:focus { border-color: var(--green); }
+  .modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+  .btn-primary { background: var(--green); color: #000; border: none; border-radius: var(--radius); padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text2); border-radius: var(--radius); padding: 8px 14px; font-size: 13px; cursor: pointer; }
+  .btn-secondary:hover { border-color: var(--border-hover); color: var(--text); }
+
+  /* ── STATES ── */
+  .state-loading, .state-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: var(--text3); gap: 12px; }
+  .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .state-empty .icon { font-size: 36px; opacity: .4; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="5" height="5" rx="1" fill="#000"/>
+        <rect x="9" y="2" width="5" height="5" rx="1" fill="#000"/>
+        <rect x="2" y="9" width="5" height="5" rx="1" fill="#000"/>
+        <rect x="9" y="9" width="5" height="5" rx="1" fill="#000"/>
+      </svg>
+    </div>
+    Noetic Creative
+  </a>
+  <div class="header-sep"></div>
+  <div class="search-wrap">
+    <span class="search-icon">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+    </span>
+    <input type="text" id="search-input" placeholder="Search repos..." autocomplete="off">
+  </div>
+  <button class="btn-token" id="token-btn" title="Add GitHub token to see private repos">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a4.5 4.5 0 0 0-4.5 4.5v.75A2.75 2.75 0 0 0 1 9v4.75A2.25 2.25 0 0 0 3.25 16h9.5A2.25 2.25 0 0 0 15 13.75V9a2.75 2.75 0 0 0-2.5-2.75V5.5A4.5 4.5 0 0 0 8 1zm0 1.5a3 3 0 0 1 3 3v.75h-6V5.5a3 3 0 0 1 3-3zm3.75 5A1.25 1.25 0 0 1 13 8.75h.5A1.25 1.25 0 0 1 14.5 9v4.75A.75.75 0 0 1 13.75 14.5h-9.5a.75.75 0 0 1-.75-.75V9A1.25 1.25 0 0 1 3.5 7.75V7.5h9v.5z"/></svg>
+    Token
+  </button>
+</header>
+
+<div class="layout">
+  <aside id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Views</div>
+      <button class="folder-btn active" data-folder="all" onclick="setFolder('all')">
+        <span class="folder-icon">⊞</span> All repos
+        <span class="folder-count" id="count-all">—</span>
+      </button>
+      <button class="folder-btn" data-folder="ungrouped" onclick="setFolder('ungrouped')">
+        <span class="folder-icon">·</span> Ungrouped
+        <span class="folder-count" id="count-ungrouped">—</span>
+      </button>
+    </div>
+    <div class="sidebar-section" id="folders-section">
+      <div class="sidebar-label">Folders</div>
+      <div id="folder-list"></div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <div class="toolbar-title" id="view-title">All repos <span id="view-count"></span></div>
+      <div class="sort-group">
+        <button class="sort-btn active" data-sort="updated" onclick="setSort('updated')">Recent</button>
+        <button class="sort-btn" data-sort="name" onclick="setSort('name')">A–Z</button>
+        <button class="sort-btn" data-sort="stars" onclick="setSort('stars')">Stars</button>
+      </div>
+      <div class="view-toggle">
+        <button class="view-btn active" id="grid-btn" onclick="setView('grid')" title="Grid view">⊞</button>
+        <button class="view-btn" id="list-btn" onclick="setView('list')" title="List view">☰</button>
+      </div>
+    </div>
+    <div id="repo-container" class="repo-grid"></div>
+  </main>
+</div>
+
+<!-- Token Modal -->
+<div class="modal-overlay hidden" id="token-modal">
+  <div class="modal">
+    <h3>GitHub Personal Access Token</h3>
+    <p>Add a token with <code>repo</code> scope to display private repositories. Stored locally in your browser only — never sent anywhere except GitHub's API.</p>
+    <input type="password" id="token-input" placeholder="ghp_..." autocomplete="off">
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="clearToken()">Clear token</button>
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveToken()">Save & reload</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────
+let allRepos = [];
+let config = {};
+let currentFolder = 'all';
+let currentSort = 'updated';
+let currentView = 'grid';
+let searchQuery = '';
+
+// ── Init ───────────────────────────────────────────────
+async function init() {
+  showLoading();
+  try {
+    config = await fetch('config.json').then(r => r.json());
+  } catch {
+    config = { org: 'Noetic-Creative', folders: [], ungrouped_label: 'Other', site_title: 'Noetic Creative' };
+  }
+  document.title = (config.site_title || 'Noetic Creative') + ' — Repos';
+  renderFolders();
+  await loadRepos();
+}
+
+// ── GitHub API ─────────────────────────────────────────
+async function loadRepos() {
+  showLoading();
+  const token = localStorage.getItem('nc_gh_token');
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const org = config.org || 'Noetic-Creative';
+
+  try {
+    let repos = [];
+    let page = 1;
+    while (true) {
+      const url = `https://api.github.com/orgs/${org}/repos?per_page=100&page=${page}&sort=updated`;
+      const resp = await fetch(url, { headers });
+      if (!resp.ok) throw new Error(`GitHub API: ${resp.status}`);
+      const batch = await resp.json();
+      repos = repos.concat(batch);
+      if (batch.length < 100) break;
+      page++;
+    }
+    allRepos = repos;
+    updateCounts();
+    render();
+    if (token) document.getElementById('token-btn').classList.add('active');
+  } catch (err) {
+    document.getElementById('repo-container').innerHTML =
+      `<div class="state-empty"><div class="icon">⚠</div><div>Could not load repos: ${err.message}</div></div>`;
+  }
+}
+
+// ── Folders ────────────────────────────────────────────
+function getFolderRepos(folderId) {
+  const folder = (config.folders || []).find(f => f.id === folderId);
+  if (!folder) return [];
+  return allRepos.filter(r => (folder.repos || []).includes(r.name));
+}
+
+function getUngrouped() {
+  const allFolderRepos = (config.folders || []).flatMap(f => f.repos || []);
+  return allRepos.filter(r => !allFolderRepos.includes(r.name));
+}
+
+function renderFolders() {
+  const list = document.getElementById('folder-list');
+  list.innerHTML = '';
+  (config.folders || []).forEach(folder => {
+    const btn = document.createElement('button');
+    btn.className = 'folder-btn';
+    btn.setAttribute('data-folder', folder.id);
+    btn.onclick = () => setFolder(folder.id);
+    btn.innerHTML = `<span class="folder-icon">${folder.icon || '▸'}</span> ${folder.name}<span class="folder-count" id="count-${folder.id}">—</span>`;
+    list.appendChild(btn);
+  });
+}
+
+function updateCounts() {
+  document.getElementById('count-all').textContent = allRepos.length;
+  document.getElementById('count-ungrouped').textContent = getUngrouped().length;
+  (config.folders || []).forEach(folder => {
+    const el = document.getElementById(`count-${folder.id}`);
+    if (el) el.textContent = getFolderRepos(folder.id).length;
+  });
+}
+
+// ── Filtering & Sorting ────────────────────────────────
+function getVisible() {
+  let repos;
+  if (currentFolder === 'all') repos = [...allRepos];
+  else if (currentFolder === 'ungrouped') repos = getUngrouped();
+  else repos = getFolderRepos(currentFolder);
+
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    repos = repos.filter(r =>
+      r.name.toLowerCase().includes(q) ||
+      (r.description || '').toLowerCase().includes(q) ||
+      (r.language || '').toLowerCase().includes(q)
+    );
+  }
+
+  repos.sort((a, b) => {
+    if (currentSort === 'name') return a.name.localeCompare(b.name);
+    if (currentSort === 'stars') return (b.stargazers_count || 0) - (a.stargazers_count || 0);
+    return new Date(b.updated_at) - new Date(a.updated_at);
+  });
+
+  return repos;
+}
+
+// ── Render ─────────────────────────────────────────────
+function render() {
+  const repos = getVisible();
+  const container = document.getElementById('repo-container');
+  container.className = `repo-grid${currentView === 'list' ? ' list-view' : ''}`;
+
+  // Update title
+  const folderNames = { all: 'All repos', ungrouped: config.ungrouped_label || 'Other' };
+  const f = (config.folders || []).find(f => f.id === currentFolder);
+  const title = f ? f.name : (folderNames[currentFolder] || 'All repos');
+  document.getElementById('view-title').innerHTML = `${title} <span id="view-count">${repos.length} repo${repos.length !== 1 ? 's' : ''}</span>`;
+
+  if (!repos.length) {
+    container.innerHTML = `<div class="state-empty"><div class="icon">◇</div><div>${searchQuery ? 'No repos match your search.' : 'No repos here yet.'}</div></div>`;
+    return;
+  }
+
+  container.innerHTML = repos.map(r => repoCard(r)).join('');
+}
+
+function repoCard(r) {
+  const lang = r.language || '';
+  const langClass = lang ? `lang-${lang.replace(/[^a-zA-Z]/g, '')}` : 'lang-default';
+  const updated = relativeTime(r.updated_at);
+  const folderTag = getFolderTag(r.name);
+  const listInfo = currentView === 'list'
+    ? `<div class="repo-desc">${r.description ? escHtml(r.description) : '<span style="opacity:.4">No description</span>'}</div>`
+    : '';
+
+  return `
+  <a class="repo-card" href="${r.html_url}" target="_blank" rel="noopener">
+    ${currentView === 'grid' ? `
+    <div class="repo-top">
+      <div class="repo-icon">${repoIcon(r)}</div>
+      <div>
+        <div class="repo-name">${escHtml(r.name)}${r.private ? '<span class="repo-private">🔒 private</span>' : ''}</div>
+        ${folderTag ? `<span class="repo-folder-tag">${folderTag}</span>` : ''}
+      </div>
+    </div>
+    <div class="repo-desc">${r.description ? escHtml(r.description) : '<span style="opacity:.4">No description</span>'}</div>
+    ` : `
+    <div class="repo-icon">${repoIcon(r)}</div>
+    <div style="min-width:0; flex:0 0 200px;">
+      <div class="repo-name">${escHtml(r.name)}${r.private ? '<span class="repo-private">🔒</span>' : ''}</div>
+      ${folderTag ? `<span class="repo-folder-tag">${folderTag}</span>` : ''}
+    </div>
+    ${listInfo}
+    `}
+    <div class="repo-meta">
+      ${lang ? `<span class="repo-lang"><span class="lang-dot ${langClass}"></span>${lang}</span>` : ''}
+      ${r.stargazers_count ? `<span class="repo-stat">★ ${r.stargazers_count}</span>` : ''}
+      ${r.forks_count ? `<span class="repo-stat">⑂ ${r.forks_count}</span>` : ''}
+      <span class="repo-updated">${updated}</span>
+    </div>
+  </a>`;
+}
+
+function repoIcon(r) {
+  if (r.private) return '<span style="font-size:13px;opacity:.5">🔒</span>';
+  const icons = { TypeScript: 'TS', JavaScript: 'JS', Python: 'PY', HTML: 'HT', CSS: 'CS' };
+  const label = icons[r.language] || r.name.slice(0, 2).toUpperCase();
+  return `<span style="font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--text3)">${label}</span>`;
+}
+
+function getFolderTag(name) {
+  for (const folder of (config.folders || [])) {
+    if ((folder.repos || []).includes(name)) return folder.name;
+  }
+  return null;
+}
+
+function showLoading() {
+  document.getElementById('repo-container').innerHTML = `<div class="state-loading"><div class="spinner"></div><div>Loading repos…</div></div>`;
+}
+
+// ── Controls ───────────────────────────────────────────
+function setFolder(id) {
+  currentFolder = id;
+  document.querySelectorAll('.folder-btn').forEach(b => b.classList.toggle('active', b.dataset.folder === id));
+  render();
+}
+
+function setSort(s) {
+  currentSort = s;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.toggle('active', b.dataset.sort === s));
+  render();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('grid-btn').classList.toggle('active', v === 'grid');
+  document.getElementById('list-btn').classList.toggle('active', v === 'list');
+  render();
+}
+
+document.getElementById('search-input').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  render();
+});
+
+// ── Token modal ────────────────────────────────────────
+document.getElementById('token-btn').addEventListener('click', () => {
+  const existing = localStorage.getItem('nc_gh_token') || '';
+  document.getElementById('token-input').value = existing;
+  document.getElementById('token-modal').classList.remove('hidden');
+});
+function closeModal() { document.getElementById('token-modal').classList.add('hidden'); }
+function saveToken() {
+  const val = document.getElementById('token-input').value.trim();
+  if (val) localStorage.setItem('nc_gh_token', val);
+  closeModal();
+  loadRepos();
+}
+function clearToken() {
+  localStorage.removeItem('nc_gh_token');
+  document.getElementById('token-btn').classList.remove('active');
+  closeModal();
+  loadRepos();
+}
+document.getElementById('token-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+// ── Helpers ────────────────────────────────────────────
+function relativeTime(iso) {
+  const s = (Date.now() - new Date(iso)) / 1000;
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.floor(s/60)}m ago`;
+  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+  if (s < 86400*30) return `${Math.floor(s/86400)}d ago`;
+  if (s < 86400*365) return `${Math.floor(s/86400/30)}mo ago`;
+  return `${Math.floor(s/86400/365)}y ago`;
+}
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Run ────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
